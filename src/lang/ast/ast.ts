@@ -95,6 +95,10 @@ class FunctionLiteral extends Expression { // this probably needs return params 
 class InvocationExpr extends Expression {
     Function: Expression // Identifier || FunctionLiteral
     Arguments: Expression[] // probably need return params as well
+
+    String(): string {
+        return `${this.Function.String()}(${this.Arguments.map(arg => arg.String()).join(", ")})`;
+    }
 }
 
 
