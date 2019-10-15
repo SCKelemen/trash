@@ -1,4 +1,5 @@
 import { Token, TokenKind, Tokens } from  "./../token/token";
+import {None} from "./../Util/none"; 
 
 interface Node { TokenLiteral(): string; String(): string}
 
@@ -27,12 +28,12 @@ class Program  {
 }
 
 // statements
-class ExpressionStmt extends Statement {}
-class ReturnStmt  extends Statement {}
+class ExpressionStmt extends Statement {Expression: Expression}
+class ReturnStmt  extends Statement {Value: Expression}
 
 // expressions
-class IdentifierExpr extends Expression {}
-class IntegerLiteralExpr extends Expression {}
+class IdentifierExpr extends Expression {Value: string }
+class IntegerLiteralExpr extends Expression {Value: Number}
 
 class PrefixExpr extends Expression {
     Operator: string
@@ -53,5 +54,55 @@ class InfixExpr extends Expression {
     }
 }
 
+class BooleanExpr extends Expression {
+   Value: Boolean 
+
+   String(): string {
+       return this.Token.Literal;
+   }
+}
+
+class IfExpr extends Expression {
+    Condition: Expression; 
+    Consequence: BlockStmt; 
+    Alternative: BlockStmt | None ;
+
+    String(): string {
+        let pre = `if ${this.Condition.String()} ${this.Consequence.String()}` 
+        if (this.Alternative != None) {            
+            return `${pre} else ${(this.Alternative as BlockStmt).String()}`
+        }
+        return pre; 
+    }
+}
 
 
+class BlockStmt extends Statement {
+    Statements: Statement[] 
+
+    String(): string {
+        return this.Statements.map(stmt => stmt.String()).join(" ");
+    }
+}
+
+
+class FunctionLiteral extends Expression { // this probably needs return params too
+    Arguments:  IdentifierExpr[]
+    Body: BlockStmt
+}
+
+
+class InvocationExpr extends Expression {
+    Function: Expression // Identifier || FunctionLiteral
+    Arguments: Expression[] // probably need return params as well
+}
+
+
+class LetStmt extends Statement {
+    Name: IdentifierExpr
+    Value: Expression
+
+    String(): string {
+        return `${this.TokenLiteral()} ${this.Name.String()} = ${this.Value.String};`
+    }
+}
