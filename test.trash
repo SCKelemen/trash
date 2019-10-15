@@ -19,3 +19,8 @@ type string = [ char ]
 
 type list = [ type ]
 
+List[T] = 
+  head: T
+  tail: List[T]
+  
+
